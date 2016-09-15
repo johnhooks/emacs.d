@@ -1,0 +1,17 @@
+elpa/
+eshell/
+backups/
+savefiles/
+auto-save-list/
+
+config.el
+
+projects/
+node_modules/
+
+# emacs backups and auto-save symbolic links
+*~
+.#*
+*.elc
+
+.DS_Store

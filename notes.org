@@ -1,0 +1,201 @@
+#+TITLE:  The Emacs Notes
+#+AUTHOR: John Hooks
+#+EMAIL:  john@bitmachina.com
+#+DATE:   <2016-09-02 Fri>
+#+STARTUP: showall
+
+** Help
+- ~C-h f~ describe-function
+- ~C-h v~ describe-variable
+- ~C-h k~ describe-key
+
+** Buffers
+- ~C-x <right>~ next-buffer
+- ~C-x <left>~ previous-buffer
+
+~append-to-buffer~ Append region before point in a specified buffer.
+
+** Windows
+- ~C-x 0~ Delete selected window
+- ~C-x 1~ Delete other windows, single window fills the frame
+- ~C-x 2~ New window below
+- ~C-x 3~ New window on right
+- ~C-x o~ Cycle other visible windows
+
+*** Winner-mode
+The important key chords are:
+- ~C-x <left>~ Undo
+- ~C-x <right>~ Redo
+
+** Movement
+- ~M-{~ backward-paragraph
+- ~M-}~ forward-paragraph
+
+*** zap-to-char
+- ~M-z~ zap-up-to-char
+
+*** paredit
+In OSX, mission control keyboard shortcuts typically need to be remapped,
+or you could remap paredit as an alternative.
+
+Barf and Slurp Keys Chords:
+- ~C-<right>~ or ~C-)~ - ~(paredit-forward-barf-sexp)~
+- ~C-<left>~ or ~C-}~ - ~(paredit-forward-barf-sexp)~
+- ~C-M-<right>~ or ~C-(~ - ~(paredit-backward-slurp-sexp)~
+- ~C-M-<left>~ or ~C-{~ - ~(paredit-backward-barf-sexp)~
+
+Deep Changing Key Chords:
+- ~M-(~ - ~(paredit-wrap-round)~
+- ~M-s~ - ~(paredit-slice-sexp)~
+
+** Mark
+- ~C-SPC~ - ~(set-mark-command)~
+  Set the mark at point and push the old mark position on local mark ring.
+- ~C-SPC C-SPC~  push-mark without activating it.
+  The second ~(set-mark-command)~ deactivates the current mark.
+- ~C-u C-SPC~ jump to the mark and set the mark from postion popped
+  off the local mark ring (does't affect the global mark ring)
+- ~C-x C-x~ Go back to previous mark... though this sets a mark before going back
+- ~C-x h~ mark-whole-buffer
+
+I am using ~(transient-mark-mode)~ and do not want to begin highlighting
+when all I want is to save my place, the possible commands are
+- ~C-SPC C-g~ - Set Mark and then abort the command or...
+- ~C-SPC C-SPC~ - Probably quicker
+
+~(push-mark)~ Set mark at LOCATION (point, by default) and push old
+mark on mark ring.
+
+#+BEGIN_QUOTE
+Novice Emacs Lisp programmers often try to use the mark for the wrong
+purposes.  The mark saves a location for the user's convenience.
+Most editing commands should not alter the mark.
+To remember a location for internal use in the Lisp program,
+store it in a Lisp variable.
+#+END_QUOTE
+Example:
+#+BEGIN_SRC emacs-lisp
+   (let ((beg (point))) (forward-line 1) (delete-region beg (point)))
+#+END_SRC
+
+Read More About...
+
+~(set-mark-command-repeat-pop)~ - can be use with ~C-u C-u C-SPC~ even if
+value is nil
+
+** Functions & Variables
+Functions and variables can share names, they are maintained seperately.
+
+~setq~ The ~q~ is for quote.
+
+~(set symbol 'value)~ short hand for ~(set 'symbol 'value)~
+
+In this special form, the symbol is literal (not evaluated).
+It is also possible to set mutliple variables from one expression.
+
+#+BEGIN_SRC emacs-lisp
+  (setq trees '(pine fir oak maple)
+        herbivores '(gazelle antelope zebra))
+#+END_SRC
+
+** let
+A ~let~ expression is just "syntactic sugar" for a corresponding ~lambda~ form
+
+#+BEGIN_SRC emacs-lisp
+  (let ((a 1)
+        (b 3))
+    (+ a b))
+#+END_SRC
+
+The expression above is equivalent to
+
+#+BEGIN_SRC emacs-lisp
+    ((lambda (a b)
+       (+ a b))
+     1 3)
+#+END_SRC
+
+*** let*
+Fulfills the general purpose as ~let~, though ~let*~ binds each symbol in sequence,
+so the following variables in the varlist can make use of those previously defined.
+
+#+BEGIN_SRC emacs-lisp
+  (let ((a 1)
+        (b (+ a 2))
+    (+ a b))
+#+END_SRC
+
+** Prefix
+The Universal Argument ~(universal-argument)~
+
+- ~C-u~ defaults to 4 times, though can be called with a number
+  Example: ~C-u 3 C-f~ call ~(forward-char)~ with an argument of 3
+- ~C-u Cu~ multiple calls without a digit multiply by four
+  Example: ~C-u C-u C-f~ would call ~(forward-char)~ with an argument of 16
+- ~(digit-argument)~ : ~M-3~ -> 3
+  ~<Meta>~ in combination with a number followed by key chord
+  Example: ~M-3 C-f~ call ~(forward-char)~ with an argument of 3
+- ~(negative-argument)~ : ~M--~ -> -1
+
+** Evaluate
+- ~C-M-x~ - ~(eval-defun)~ Can be called anywhere in a form and will evaluate
+  the outermost form. If prefixed with ~C-u~, edebug the elisp debugger will
+  be enabled. /Important/
+- ~M-:~ - ~(eval-expression)~ - Evaluate single expression in minibuffer. Note:
+  does not take /sexps/ as input. If prefixed with ~C-u~ the result will output
+  to the buffer.
+- ~C-x C-e~ - ~(eval-last-sexp)~ Cannot update variables declared with
+  ~defvar~ or ~defcustom~
+- ~C-u C-x C-e~  - ~(eval-last-sexp)~ and output to buffer
+- ~(eval-buffer)~
+- ~(eval-region)~
+
+** Emacs Lisp REPL
+- ~M-x ielm~ inferior emacs lisp mode
+- ~C-c C-b~ Changes ielm's working buffer. Allows access to buffer-local variables.
+- ~C-<up>~ previous expression in history
+- ~C-<down>~ next expression in history
+
+** Packages
+- ~M-x list-packages U x~ Upgrades all installed packages
+
+** Spelling
+~M-$~ ispell-word at point or region
+
+** Bookmarks
+- ~C-x r m~ – set a bookmark at the current location (e.g. in a file)
+- ~C-x r b~ – jump to a bookmark
+- ~C-x r l~ – list your bookmarks
+- ~M-x bookmark-delete~ – delete a bookmark by name
+
+** Read More
+~save-excursion~
+
+#+BEGIN_SRC emacs-lisp
+  (message "We are %d characters into this buffer."
+           (- (point)
+              (save-excursion
+                (goto-char (point-min)) (point))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq somevar )
+  (let ((foo (buffer-name))
+        (bar (buffer-size)))
+    (message
+     "This buffer is %s and has %d characters."
+     foo bar))
+#+END_SRC
+
+** ERC
+~erc-track-mode~ temporarily disable channel tracking \\
+Don't know if it works
+
+Might need this... \\
+~(setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT"))~
+
+** Org-mode
+- ~C-c '~ Edit source code block and return to org file from block.
+- ~<TAB>~ key chord for ~org-cycle~ local visibility cycling
+- ~C-u <TAB>~  key chord for ~org-global-cycle~ visibility
+- ~C-u C-u C-u <TAB>~ key chord fro ~show-all~ Unfold all
