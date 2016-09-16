@@ -59,9 +59,9 @@
 ** Chapter Four /The Betterment of User Interface/
 
    To hone the necessary skills required to master the manipulation of
-   buffers, the ease of a graphic user interfaces must be denied. From
-   first were elisp summoned through the use of keychords, and thus it
-   shall remain. 
+   buffers, one must deny the ease of graphic user interfaces. From the
+   beginning were elisp summoned through the use of keychords, and thus
+   it shall remain. 
 
    #+begin_src emacs-lisp :tangle yes
      (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -87,9 +87,9 @@
 
 ** Chapter Five /The Great Migration/
 
-   Is there no greater sin than to create what hath already been
-   created? No elisper is an island and accepting the code of others
-   is no shame.
+   I ask you, is there no greater sin than to create what hath already
+   been created? No elisper is an island. Let thine brother's code be
+   thine, and save the mind for thine own work.
 
    Using the [[https://melpa.org][Milkypostman's Emacs Lisp Package Archive]]
 
@@ -107,7 +107,7 @@
      (package-initialize)
    #+end_src
 
-   Open the gates, may the elisp migrate across the great network
+   Open the gates, may the elisps migrate across the great network
    freely! Never again shall thee be limited to the work of thine own
    hands. May what has been build never be torn asunder.
 
@@ -147,7 +147,7 @@
 
    There are few finer creations than [[https://github.com/bbatsov/prelude][Prelude]] by [[http://batsov.com/][Bozhidar Batsov]],
    though the nature of creation necessitates understanding an item
-   to the core of its essense. Taken what can be comprehended and
+   to the core of its essense. Take what can be comprehended and
    leave the rest for further study.
 
    [[http://emacsredux.com/blog/2013/06/15/open-line-above/][open-line-above]]
@@ -165,11 +165,13 @@
    The Great Gnu may He be with thee.
    
    1. May Zenburn ease the strain of concentrating on Thine text Oh Emacs
+      
       #+begin_src emacs-lisp :tangle yes
         (load-theme 'zenburn t)
       #+end_src
 
    2. Thank you for Diminish which keeps Thine mode line clean
+
       #+begin_src emacs-lisp
         (require 'diminish)
 
@@ -187,6 +189,7 @@
 
    3. Oh, may Saveplace evermore remember mine point and return it
       thus to its previous location.
+
       #+begin_src emacs-lisp
         (require 'saveplace)
         (setq-default save-place t)
@@ -195,6 +198,7 @@
 
    4. Thank you for Uniquify, without which much confusion would reign
       simply by the plethora of simularily names buffers. Oh the horror!
+
       #+begin_src emacs-lisp
         (require 'uniquify)
         (setq uniquify-buffer-name-style 'reverse)
@@ -213,6 +217,7 @@
 
    6. [[https://github.com/joaotavora/yasnippet][YASnippet]], thanks be to thee for keeping mine snippets close and
       ever ready for expansion.
+
       #+begin_src emacs-lisp :tangle yes
         (require 'yasnippet)
         (setq yas-snippet-dirs (list (expand-file-name "snippets/"
@@ -222,6 +227,7 @@
 
    7. Praise be to [[https://github.com/auto-complete/auto-complete][Autocomplete]]! For without thee, I would have to rely
       on only mine memory.
+
       #+begin_src emacs-lisp :tangle yes
         (require 'auto-complete)
 
@@ -242,6 +248,7 @@
    8. Judge me [[https://github.com/flycheck/flycheck][Flycheck]] for surely I have sinned and shall be found
       wanting in thine eyes. Though please have a gentle hand and
       guide me to the proper path.
+
       #+begin_src emacs-lisp :tangle yes
         (require 'flycheck)
 
@@ -275,12 +282,14 @@
    10. How, Oh Emacs, could all thine vast elisp be read without the help
        of the ever useful Rainbow Delimiters? May it continue to light
        mine way through thine maze of parenthesis.
+
        #+begin_src emacs-lisp :tangle yes
          (require 'rainbow-delimiters)
        #+end_src
 
    11. And lastly, so close to mine heart, thank you for Paredit. I ask
        you, what would life be with out Barfage and Slurpage!?!
+
        #+begin_src emacs-lisp
          (require 'paredit)
          (eval-after-load "paredit" '(diminish 'paredit))
@@ -418,10 +427,22 @@
        (setq exec-path (cons node-bin exec-path)))
    #+end_src
 
-** Chapter Twelve /The Lisp Forge/
-
-   The delving of parens necessitates powerful tools.
-
+** Chapter Twelve /The Inner Temple/
+   
+   The delving of parens, is a holy affair. To pilgrimage to the Inner
+   Temple of Lisp requires bravery, endurance, and a stubbornness to
+   never give up no matter how many visits paid to the Debugger.
+   First, be baptised, dear hacker, in the river List by two the
+   brothers Car and Cdr, and never again shall thee be tempted by the
+   demon Length. Proceed then down the dark path of Funcall to be
+   anointed by the high priest Lambda, and the manipulation of
+   functions shall seem as if childs play. Before ascending the stair
+   Defun, be prepared to face the demigods Quasiquote and Unquote.
+   Their power is great and shall imbue thee with it, though heed
+   caution, for it is the power of the Gods to wield code in such a
+   manner. Finally, come into the Temple and be blessed by the mighty
+   Cons, for thine is Kingdom of Lisp.
+   
    #+begin_src emacs-lisp
      (add-hook 'emacs-lisp-mode-hook #'whitespace-cleanup-mode)
      (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
