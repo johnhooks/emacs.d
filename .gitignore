@@ -6,6 +6,7 @@ auto-save-list/
 
 config.el
 
+site-lisp/
 projects/
 node_modules/
 

@@ -63,5 +63,13 @@ Position the cursor at it's beginning, according to the current mode."
                        (when
                            (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
+(defun my/goto-match-beginning ()
+  "To advise :after `isearch-exit' to return to beginning of search."
+  (when (and isearch-forward isearch-other-end)
+    (goto-char isearch-other-end)))
+
+;; move to better location
+(advice-add 'isearch-exit :after 'my/goto-match-beginning)
+
 (provide 'functions)
 ;;; functions.el ends here

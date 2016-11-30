@@ -24,13 +24,15 @@
 
 ;; Show line numbers
 ;; Adding a hook to prog-mode seems better to me than global
+;; NOTE: disabling default linum-mode in prog-mode, think I've
+;; changed my mind... don't like all those line numbers!
 ;; (global-linum-mode)
-(add-hook 'prog-mode-hook
-          (lambda ()
-            ;; turn on linum-mode' only when there are less than 5000 line
-            (if (and (< (buffer-size))
-                     (* 5000 80))
-                (linum-mode 1))))
+;; (add-hook 'prog-mode-hook
+;;           (lambda ()
+;;             ;; turn on linum-mode' only when there are less than 5000 line
+;;             (if (and (< (buffer-size))
+;;                      (* 5000 80))
+;;                 (linum-mode 1))))
 
 ;; Highlight current line
 (global-hl-line-mode 1)

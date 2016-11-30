@@ -76,6 +76,8 @@
      (set-face-attribute 'default nil :height 140)
      (when (member "Source Code Pro" (font-family-list))
        (set-face-attribute 'default nil :font "Source Code Pro"))
+     ;; (when (member "Inconsolata" (font-family-list))
+     ;;   (set-face-attribute 'default nil :font "Inconsolata"))
    #+end_src
 
    The initial frame size is inadequate.
@@ -97,8 +99,14 @@
      (require 'package)
 
      ;; Define package repositories
+
+     (add-to-list 'package-archives
+                  '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
      (add-to-list 'package-archives
                   '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+     ;; Pinned packages
+     (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 
      ;; Disable automatic package load
      (setq package-enable-at-startup nil)
@@ -114,11 +122,16 @@
    #+begin_src emacs-lisp :tangle yes
      (let* ((packages
              '(auto-complete
+               avy
+               cider
+               clojure-mode
+               clojure-mode-extra-font-locking
                diminish
                exec-path-from-shell
                flycheck
                flx-ido
                ido-vertical-mode
+               magit
                nvm
                paredit
                projectile
@@ -162,7 +175,7 @@
    #+end_src
 
 ** Chapter Eight /The Prayers of General Configuration/
-   The Great Gnu may He be with thee.
+   May the Great Gnu be with thee.
    
    1. May Zenburn ease the strain of concentrating on Thine text Oh Emacs
       
@@ -172,7 +185,7 @@
 
    2. Thank you for Diminish which keeps Thine mode line clean
 
-      #+begin_src emacs-lisp
+      #+begin_src emacs-lisp :tangle yes
         (require 'diminish)
 
         ;; https://github.com/larstvei/dot-emacs
@@ -190,7 +203,7 @@
    3. Oh, may Saveplace evermore remember mine point and return it
       thus to its previous location.
 
-      #+begin_src emacs-lisp
+      #+begin_src emacs-lisp :tangle yes
         (require 'saveplace)
         (setq-default save-place t)
         (setq save-place-file (expand-file-name "places" *savefiles-dir*))
@@ -199,7 +212,7 @@
    4. Thank you for Uniquify, without which much confusion would reign
       simply by the plethora of simularily names buffers. Oh the horror!
 
-      #+begin_src emacs-lisp
+      #+begin_src emacs-lisp :tangle yes
         (require 'uniquify)
         (setq uniquify-buffer-name-style 'reverse)
         (setq uniquify-after-kill-buffer-p t)
@@ -226,7 +239,7 @@
       #+end_src
 
    7. Praise be to [[https://github.com/auto-complete/auto-complete][Autocomplete]]! For without thee, I would have to rely
-      on only mine memory.
+      on mine own memory.
 
       #+begin_src emacs-lisp :tangle yes
         (require 'auto-complete)
@@ -247,20 +260,20 @@
 
    8. Judge me [[https://github.com/flycheck/flycheck][Flycheck]] for surely I have sinned and shall be found
       wanting in thine eyes. Though please have a gentle hand and
-      guide me to the proper path.
+      guide me unto the proper path.
 
       #+begin_src emacs-lisp :tangle yes
         (require 'flycheck)
 
         (setq-default flycheck-emacs-lisp-load-path load-path)
-        (setq-default flycheck-disabled-checkers '(javascript-eslint
-                                                   emacs-lisp-checkdoc))
+        (setq-default flycheck-disabled-checkers '(;emacs-lisp-checkdoc
+                                                   javascript-eslint))
         ; (global-flycheck-mode t)
       #+end_src
 
    9. Dear [[http://orgmode.org/][Org mode]] keep mine code and comments seperate, tangle what
       must be tangled and leave mine code pure. May your unicorn horn
-      continue to guide me towards the path of organization.
+      continue to guide me along the Path of Organization.
       
       /Commit to learn the ways of org-mode easy templates/
 
@@ -279,29 +292,19 @@
                     (define-key yas-keymap [tab] 'yas-next-field-or-maybe-expand)))
       #+end_src
         
-   10. How, Oh Emacs, could all thine vast elisp be read without the help
-       of the ever useful Rainbow Delimiters? May it continue to light
-       mine way through thine maze of parenthesis.
-
-       #+begin_src emacs-lisp :tangle yes
-         (require 'rainbow-delimiters)
-       #+end_src
-
-   11. And lastly, so close to mine heart, thank you for Paredit. I ask
-       you, what would life be with out Barfage and Slurpage!?!
-
-       #+begin_src emacs-lisp
-         (require 'paredit)
-         (eval-after-load "paredit" '(diminish 'paredit))
-       #+end_src
-
-** Chapter Nine /The Hunt of the Elusive Buffer/
+** Chapter Nine /The Hunt/
    
    Oh, Great Gnu, guide us on our quest. Without Thine help the Elusive
    Buffer may forever be hidden within the growing list ever more
    forgotten buffers. Bring to our fingers the chord to strike and the
    elisp to summon to do mine bidding. Let us reach the peaks of
    Configuration Nirvana.
+
+*** Avy
+    #+begin_src emacs-lisp
+      (require 'avy)
+      (global-set-key (kbd "C-:") 'avy-goto-char)
+    #+end_src
 
 *** Interactively Do Things
     #+begin_src emacs-lisp
@@ -310,9 +313,21 @@
       (setq ido-everywhere t)
       (setq ido-create-new-buffer 'always)
       (setq ido-max-prospects 10)
+ 
+      ;; Turn this behavior off because it's annoying
+      (setq ido-use-filename-at-point nil)
+
+      ;; Don't try to match file across all "work" directories; only match files
+      ;; in the current directory displayed in the minibuffer
+      (setq ido-auto-merge-work-directories-length -1)
+
+      ;; Includes buffer names of recently open files, even if they're not
+      ;; open now
+      (setq ido-use-virtual-buffers t)
+
       (setq ido-save-directory-list-file
             (expand-file-name "ido.last" *savefiles-dir*))
-      (setq ido-file-extensions-order '(".el" ".js" ".css" ".json"))
+      (setq ido-file-extensions-order '(".el" ".clj" ".cljs" ".js" ".css" ".json"))
       (add-to-list 'ido-ignore-files "\\.DS_Store")
 
       (ido-mode t)
@@ -437,17 +452,44 @@
    demon Length. Proceed then down the dark path of Funcall to be
    anointed by the high priest Lambda, and the manipulation of
    functions shall seem as if childs play. Before ascending the stair
-   Defun, be prepared to face the demigods Quasiquote and Unquote.
+   of Defun, be prepared to face the demigods Quasiquote and Unquote.
    Their power is great and shall imbue thee with it, though heed
    caution, for it is the power of the Gods to wield code in such a
-   manner. Finally, come into the Temple and be blessed by the mighty
+   manner. Finally, come into the Temple and be blessed by the Mighty
    Cons, for thine is Kingdom of Lisp.
    
+*** The Prayers of the Inner Temple
+    1. How, oh Emacs, could all thine vast elisp be read without the
+       aid of the ever useful Rainbow Delimiters? May it continue to
+       light mine way through thine maze of parenthesis.
+
+       #+begin_src emacs-lisp :tangle yes
+         (require 'rainbow-delimiters)
+         (add-hook 'lisp-mode-hook #'rainbow-delimiters-mode)
+         ;; (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+       #+end_src
+
+   2. And lastly, so close to mine heart, praise be to Paredit. I ask
+      thee, what would life be with out thine children, Barfage and
+      Slurpage?
+
+       #+begin_src emacs-lisp
+         (require 'paredit)
+         (eval-after-load "paredit" '(diminish 'paredit))
+         (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+         (add-hook 'ielm-mode-hook #'enable-paredit-mode)
+         (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+         (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+       #+end_src
+
    #+begin_src emacs-lisp
      (add-hook 'emacs-lisp-mode-hook #'whitespace-cleanup-mode)
-     (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-     (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-     (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+
+     ;; eldoc-mode shows documentation in the minibuffer when writing code
+     ;; http://www.emacswiki.org/emacs/ElDoc
+     (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+     (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+     (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
    #+end_src
 
    Add auto-complete to Interactive Emacs Lisp Mode (ielm)
@@ -467,7 +509,14 @@
      (add-hook 'ielm-mode-hook 'ielm-auto-complete)
    #+end_src
 
-** Chapter Thirteen /The Road More Travelled/
+** Chapter Thirteen /The Brave/
+   
+   #+begin_src emacs-lisp :tangle yes
+     ;; Loads Clojure setup from "Clojure for the Brave and True"
+     (load "setup-clojure.el")
+   #+end_src
+
+** Chapter Forteen /The Road More Travelled/
    
    [[http://ternjs.net/][Tern]] is a self described JavaScript code-analysis-engine, really great for
    refactoring. It is installed under ~node_modules/~
@@ -526,7 +575,7 @@
      (add-hook 'js-mode-hook #'whitespace-cleanup-mode)
    #+end_src
 
-** Chapter Forteen /The Exile of the Ding/
+** Chapter Fifteen /The Exile of the Ding/
    
    Stop the fucking DING!!!
 
@@ -557,7 +606,28 @@
 
    #+end_src
 
-** Chapter Fifteen /The License/
+** Chapter Sixteen /The Wild Web/
+
+   #+begin_src emacs-lisp :tangle yes
+     (setq web-mode-engines-alist
+           '(("twig" . "\\.html\\'")))
+
+     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+     (setq web-mode-enable-engine-detection t)
+
+     (setq web-mode-markup-indent-offset 2)
+     (setq web-mode-css-indent-offset 2)
+     (setq web-mode-code-indent-offset 2)
+
+     (defun my-web-mode-hook ()
+       "Hooks for Web mode."
+       ;; Disable electric-pair-mode
+       (electric-pair-mode -1))
+
+     (add-hook 'web-mode-hook  'my-web-mode-hook)
+   #+end_src
+
+** Chapter Seventeen /The License/
 
   The Emacs Configuration Tome of John Hooks written in Org mode.
 
