@@ -1,1 +1,653 @@
-config.org
+#+TITLE:  The Emacs Configuration Tome of John Hooks
+#+AUTHOR: John Hooks
+#+EMAIL:  john@bitmachina.com
+#+DATE:   <2016-09-02 Fri>
+** Chapter One /Formless/
+
+   In the beginning, Emacs was without form, and void, and darkness was
+   upon the screen. And the Spirit of Hacking moved upon the pixels of
+   the monitor. And The Great Gnu said, Let there be elisps, and there
+   were elisps...
+
+   The elisps grew and multiplied as the Spirit moved across the
+   network. New worlds of Emacs came into being, each its own creation,
+   each a story told by its Creator.
+
+** Chapter Two /The Dividing of Eden/
+
+   The Creator looked upon what was made and it was apparent the new
+   elisps would need a place to call their own. Behold a directory...
+
+   #+begin_src emacs-lisp :tangle yes
+     (add-to-list 'load-path (expand-file-name "lisp"
+                                               user-emacs-directory))
+   #+end_src
+
+   For a time it was good. The elisps lived in the garden and prospered.
+   Though unbeknownst to them, a plague was filling their home. Deep
+   from within creation, older elisps were churning out history files,
+   savefiles, and other vile necessities. It seemed as if war was
+   imminent. As the new elisps prepared for battle, the invaders knowing
+   themselves inferior fled the directory. Though the Creator took pity
+   on these nomads and prepared a special place for them.
+
+   #+begin_src emacs-lisp :tangle yes
+     (defvar *savefiles-dir*
+      (expand-file-name "savefiles/" user-emacs-directory)
+      "This directory contains save and history files.")
+     (unless (file-exists-p *savefiles-dir*)
+      (make-directory *savefiles-dir*))
+   #+end_src
+
+   #+begin_src emacs-lisp :tangle yes
+     (require 'tools)
+     (my/add-subfolders-to-load-path (expand-file-name "projects/"
+                                                      user-emacs-directory))
+   #+end_src
+
+** Chapter Three /The Cultivation of Eden/
+
+   The elisps and the Creator worked the garden. The fruits of their
+   labor blossomed from bare buffers into working programs. Though
+   sometimes the effort left the Creator strained and weak. From the
+   network He had heard the fables of Configuration. After a long
+   journey through cyberspace and studying the tomes left by other
+   Creators. He walked out from the garden into the wild world of
+   Emacs. His eyes opened and His elisps with Him, they began to tame
+   the world of the Ancient Ones.
+
+** Chapter Four /The Betterment of User Interface/
+
+   To hone the necessary skills required to master the manipulation of
+   buffers, one must deny the ease of graphic user interfaces. From the
+   beginning were elisp summoned through the use of keychords, and thus
+   it shall remain. 
+
+   #+begin_src emacs-lisp :tangle yes
+     (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+     (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+     (setq inhibit-startup-message t)
+   #+end_src
+
+   The beauty of [[https://github.com/adobe-fonts/source-code-pro][Source Code Pro]] is no secret. Be thy default font
+   face and increase in size.
+
+   #+begin_src emacs-lisp :tangle yes
+     (set-face-attribute 'default nil :height 140)
+     (when (member "Source Code Pro" (font-family-list))
+       (set-face-attribute 'default nil :font "Source Code Pro"))
+     ;; (when (member "Inconsolata" (font-family-list))
+     ;;   (set-face-attribute 'default nil :font "Inconsolata"))
+   #+end_src
+
+   The initial frame size is inadequate.
+
+   #+begin_src emacs-lisp :tangle yes
+     (add-to-list 'initial-frame-alist '(height . 40))
+     (add-to-list 'initial-frame-alist '(width . 90))
+   #+end_src
+
+** Chapter Five /The Great Migration/
+
+   I ask you, is there no greater sin than to create what hath already
+   been created? No elisper is an island. Let thine brother's code be
+   thine, and save the mind for thine own work.
+
+   Using the [[https://melpa.org][Milkypostman's Emacs Lisp Package Archive]]
+
+   #+begin_src emacs-lisp
+     (require 'package)
+
+     ;; Define package repositories
+
+     (add-to-list 'package-archives
+                  '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
+     (add-to-list 'package-archives
+                  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+     ;; Pinned packages
+     (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
+
+     ;; Disable automatic package load
+     (setq package-enable-at-startup nil)
+
+     ;; Fire up package.el
+     (package-initialize)
+   #+end_src
+
+   Open the gates, may the elisps migrate across the great network
+   freely! Never again shall thee be limited to the work of thine own
+   hands. May what has been build never be torn asunder.
+
+   #+begin_src emacs-lisp :tangle yes
+     (let* ((packages
+             '(auto-complete
+               avy
+               cider
+               clojure-mode
+               clojure-mode-extra-font-locking
+               diminish
+               exec-path-from-shell
+               flycheck
+               flx-ido
+               ido-vertical-mode
+               magit
+               nvm
+               paredit
+               projectile
+               rainbow-delimiters
+               smex
+               whitespace-cleanup-mode
+               yasnippet
+               zenburn-theme))
+            (uninstalled (remove-if 'package-installed-p packages)))
+       (when uninstalled
+         (package-refresh-contents)
+         (mapc 'package-install uninstalled)))
+   #+end_src
+
+** Chapter Six /The Gutting of Better Defaults/
+
+   The Creator looked upon [[https://github.com/technomancy/better-defaults][better-defaults.el]] by [[http://technomancy.us/][technomancy]] and
+   it pleased Him. Though what was thine must be reforged in mine
+   image.
+
+   #+begin_src emacs-lisp :tangle yes
+     (require 'defaults)
+   #+end_src
+
+** Chapter Seven /The Pillage of Prelude/
+
+   There are few finer creations than [[https://github.com/bbatsov/prelude][Prelude]] by [[http://batsov.com/][Bozhidar Batsov]],
+   though the nature of creation necessitates understanding an item
+   to the core of its essense. Take what can be comprehended and
+   leave the rest for further study.
+
+   [[http://emacsredux.com/blog/2013/06/15/open-line-above/][open-line-above]]
+
+   #+begin_src emacs-lisp :tangle yes
+     (require 'functions)
+     (define-key (current-global-map)[remap move-beginning-of-line]
+       'my/move-beginning-of-line)
+     (global-set-key (kbd "M-o") #'my/open-line)
+     (global-set-key (kbd "M-O") #'my/open-line-above)
+     (global-set-key (kbd "C-;") #'my/toggle-comment-on-line)
+   #+end_src
+
+** Chapter Eight /The Prayers of General Configuration/
+   May the Great Gnu be with thee.
+   
+   1. May Zenburn ease the strain of concentrating on Thine text Oh Emacs
+      
+      #+begin_src emacs-lisp :tangle yes
+        (load-theme 'zenburn t)
+      #+end_src
+
+   2. Thank you for Diminish which keeps Thine mode line clean
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'diminish)
+
+        ;; https://github.com/larstvei/dot-emacs
+        (defmacro safe-diminish (file mode &optional new-name)
+          `(with-eval-after-load ,file
+             (diminish ,mode, new-name)))
+
+        ;; http://whattheemacsd.com
+        (defmacro rename-modeline (package-name mode new-name)
+          `(eval-after-load ,package-name
+             '(defadvice ,mode (after rename-modeline activate)
+                (setq mode-name ,new-name))))
+      #+end_src
+
+   3. Oh, may Saveplace evermore remember mine point and return it
+      thus to its previous location.
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'saveplace)
+        (setq-default save-place t)
+        (setq save-place-file (expand-file-name "places" *savefiles-dir*))
+      #+end_src
+
+   4. Thank you for Uniquify, without which much confusion would reign
+      simply by the plethora of simularily names buffers. Oh the horror!
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'uniquify)
+        (setq uniquify-buffer-name-style 'reverse)
+        (setq uniquify-after-kill-buffer-p t)
+        (setq uniquify-ignore-buffers-re "^\\*")
+      #+end_src
+
+   5. May mine sins continue to be washed clean by Whitespace Cleanup Mode.
+      
+      /Activated individually by adding to each desired mode's hook/
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'whitespace-cleanup-mode)
+        (eval-after-load "whitespace-cleanup-mode" '(diminish 'whitespace-cleanup-mode))
+      #+end_src
+
+   6. [[https://github.com/joaotavora/yasnippet][YASnippet]], thanks be to thee for keeping mine snippets close and
+      ever ready for expansion.
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'yasnippet)
+        (setq yas-snippet-dirs (list (expand-file-name "snippets/"
+                                                       user-emacs-directory)))
+        (yas-reload-all)
+      #+end_src
+
+   7. Praise be to [[https://github.com/auto-complete/auto-complete][Autocomplete]]! For without thee, I would have to rely
+      on mine own memory.
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'auto-complete)
+
+        (setq ac-comphist-file
+              (expand-file-name "ac-comphist.dat" *savefiles-dir*))
+
+        ;; resetting ac-sources
+        (setq-default ac-sources '(ac-source-yasnippet
+                                   ac-source-abbrev
+                                   ac-source-dictionary
+                                   ac-source-words-in-same-mode-buffers))
+
+        (add-to-list 'ac-dictionary-directories "ac-dict")
+
+        (ac-config-default)
+      #+end_src
+
+   8. Judge me [[https://github.com/flycheck/flycheck][Flycheck]] for surely I have sinned and shall be found
+      wanting in thine eyes. Though please have a gentle hand and
+      guide me unto the proper path.
+
+      #+begin_src emacs-lisp :tangle yes
+        (require 'flycheck)
+
+        (setq-default flycheck-emacs-lisp-load-path load-path)
+        (setq-default flycheck-disabled-checkers '(;emacs-lisp-checkdoc
+                                                   javascript-eslint))
+        ; (global-flycheck-mode t)
+      #+end_src
+
+   9. Dear [[http://orgmode.org/][Org mode]] keep mine code and comments seperate, tangle what
+      must be tangled and leave mine code pure. May your unicorn horn
+      continue to guide me along the Path of Organization.
+      
+      /Commit to learn the ways of org-mode easy templates/
+
+      #+begin_src emacs-lisp :tangle yes
+        ;; Highlight source blocks
+        (setq org-src-fontify-natively t)
+      #+end_src
+      
+      Thinking about adding yas support in org-mode
+
+      #+begin_src emacs-lisp :tangle no
+        ;; From http://orgmode.org/manual/Conflicts.html
+        (add-hook 'org-mode-hook
+                  (lambda ()
+                    (org-set-local 'yas-trigger-key [tab])
+                    (define-key yas-keymap [tab] 'yas-next-field-or-maybe-expand)))
+      #+end_src
+        
+** Chapter Nine /The Hunt/
+   
+   Oh, Great Gnu, guide us on our quest. Without Thine help the Elusive
+   Buffer may forever be hidden within the growing list ever more
+   forgotten buffers. Bring to our fingers the chord to strike and the
+   elisp to summon to do mine bidding. Let us reach the peaks of
+   Configuration Nirvana.
+
+*** Avy
+    #+begin_src emacs-lisp
+      (require 'avy)
+      (global-set-key (kbd "C-:") 'avy-goto-char)
+    #+end_src
+
+*** Interactively Do Things
+    #+begin_src emacs-lisp
+      (require 'ido)
+
+      (setq ido-everywhere t)
+      (setq ido-create-new-buffer 'always)
+      (setq ido-max-prospects 10)
+ 
+      ;; Turn this behavior off because it's annoying
+      (setq ido-use-filename-at-point nil)
+
+      ;; Don't try to match file across all "work" directories; only match files
+      ;; in the current directory displayed in the minibuffer
+      (setq ido-auto-merge-work-directories-length -1)
+
+      ;; Includes buffer names of recently open files, even if they're not
+      ;; open now
+      (setq ido-use-virtual-buffers t)
+
+      (setq ido-save-directory-list-file
+            (expand-file-name "ido.last" *savefiles-dir*))
+      (setq ido-file-extensions-order '(".el" ".clj" ".cljs" ".js" ".css" ".json"))
+      (add-to-list 'ido-ignore-files "\\.DS_Store")
+
+      (ido-mode t)
+
+      (global-set-key (kbd "C-x M-f") 'ido-find-file-other-window)
+    #+end_src
+
+*** Fuzzy Ido Matching
+
+    #+begin_src emacs-lisp
+      (require 'flx-ido)
+
+      (setq ido-enable-flex-matching t) ;; Turn on ido flexible matching.
+      (setq ido-use-faces nil) ;; Turn off ido text highlighting so flx-ido can do it.
+
+      (flx-ido-mode t)
+    #+end_src
+
+*** Ido Vertial
+    #+begin_src emacs-lisp
+      (require 'ido-vertical-mode)
+
+      (setq ido-vertical-define-keys 'C-n-and-C-p-only) ; Bind C-n and C-p.
+      (ido-vertical-mode t)
+    #+end_src
+
+*** Smex
+    #+begin_src emacs-lisp
+      (require 'smex)
+
+      (setq smex-save-file
+              (expand-file-name "smex-items" *savefiles-dir*))
+
+      (smex-initialize)
+
+      (define-key (current-global-map) [remap execute-extended-command] 'smex)
+      (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+      (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command) ; the old M-x
+    #+end_src
+
+*** Projectile
+    #+begin_src emacs-lisp
+      (require 'projectile)
+
+      (diminish 'projectile-mode "Prjl")
+
+      (setq projectile-known-projects-file
+            (expand-file-name "projectile-bookmarks.eld" *savefiles-dir*))
+      (setq projectile-cache-file
+            (expand-file-name "projectile.cache" *savefiles-dir*))
+
+      (projectile-global-mode)
+    #+end_src
+
+*** Recent Files
+    #+begin_src emacs-lisp
+      (require 'recentf)
+
+      (setq recentf-max-saved-items 100)
+      (setq recentf-max-menu-items 15)
+      (setq recentf-save-file
+            (expand-file-name "recentf" *savefiles-dir*))
+
+      (recentf-mode 1)
+
+      (defun recentf-ido-find-file ()
+        "Find a recent file using ido."
+        (interactive)
+        (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+          (when file
+            (find-file file))))
+
+      (global-set-key (kbd "C-x f") 'recentf-ido-find-file)
+    #+end_src
+
+** Chapter Ten /The Sin of Global Variables/
+
+   Mine JavaScript configuration depends on a few npm modules, which
+   are include in the ~package.json~. Rather than install them
+   globally, they are installed locally in ~node_modules/~.
+
+   #+begin_src emacs-lisp :tangle yes
+     (defvar *node-modules-dir*
+      (expand-file-name "node_modules/" user-emacs-directory)
+      "This directory contains npm packages required for js-config.el.")
+   #+end_src
+
+** Chapter Eleven /The Diversion from the Path/
+
+   When Emacs is initialized from the MacOS graphical user interface,
+   only the default environment variables are loaded. The package
+   [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell.el]] smooths most of this over by copying
+   important environment variables from the user's shell.
+
+   Though this does not seem to work with nvm, the node version manager.
+   Luckly the package [[https://github.com/rejeep/nvm.el][nvm.el]] can add a node install managed by nvm to
+   ~exec-path~.
+
+   Lastly, since the npm packages required for ~js-config.el~ are installed
+   locally we also need to add them to ~exec-path~.
+
+   #+begin_src emacs-lisp
+     (when (eq system-type 'darwin) ; (memq window-system '(mac ns)) ; difference?
+       (require 'exec-path-from-shell)
+       (exec-path-from-shell-initialize))
+
+     (require 'nvm)
+     (nvm-use (caar (last (nvm--installed-versions))))
+
+     (let ((node-bin (concat *node-modules-dir* ".bin")))
+       (setenv "PATH" (concat node-bin ":" (getenv "PATH")))
+       (setq exec-path (cons node-bin exec-path)))
+   #+end_src
+
+** Chapter Twelve /The Inner Temple/
+   
+   The delving of parens, is a holy affair. To pilgrimage to the Inner
+   Temple of Lisp requires bravery, endurance, and a stubbornness to
+   never give up no matter how many visits paid to the Debugger.
+   First, be baptised, dear hacker, in the river List by two the
+   brothers Car and Cdr, and never again shall thee be tempted by the
+   demon Length. Proceed then down the dark path of Funcall to be
+   anointed by the high priest Lambda, and the manipulation of
+   functions shall seem as if childs play. Before ascending the stair
+   of Defun, be prepared to face the demigods Quasiquote and Unquote.
+   Their power is great and shall imbue thee with it, though heed
+   caution, for it is the power of the Gods to wield code in such a
+   manner. Finally, come into the Temple and be blessed by the Mighty
+   Cons, for thine is Kingdom of Lisp.
+   
+*** The Prayers of the Inner Temple
+    1. How, oh Emacs, could all thine vast elisp be read without the
+       aid of the ever useful Rainbow Delimiters? May it continue to
+       light mine way through thine maze of parenthesis.
+
+       #+begin_src emacs-lisp :tangle yes
+         (require 'rainbow-delimiters)
+         (add-hook 'lisp-mode-hook #'rainbow-delimiters-mode)
+         ;; (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+       #+end_src
+
+   2. And lastly, so close to mine heart, praise be to Paredit. I ask
+      thee, what would life be with out thine children, Barfage and
+      Slurpage?
+
+       #+begin_src emacs-lisp
+         (require 'paredit)
+         (eval-after-load "paredit" '(diminish 'paredit))
+         (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+         (add-hook 'ielm-mode-hook #'enable-paredit-mode)
+         (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+         (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+       #+end_src
+
+   #+begin_src emacs-lisp
+     (add-hook 'emacs-lisp-mode-hook #'whitespace-cleanup-mode)
+
+     ;; eldoc-mode shows documentation in the minibuffer when writing code
+     ;; http://www.emacswiki.org/emacs/ElDoc
+     (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+     (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+     (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+   #+end_src
+
+   Add auto-complete to Interactive Emacs Lisp Mode (ielm)
+
+   #+begin_src emacs-lisp
+     (defun ielm-auto-complete ()
+       "Enables `auto-complete' support in \\[ielm].
+     As found at `https://www.masteringemacs.org/article/evaluating-elisp-emacs'"
+       (setq ac-sources '(ac-source-functions
+                          ac-source-variables
+                          ac-source-features
+                          ac-source-symbols
+                          ac-source-words-in-same-mode-buffers))
+       (add-to-list 'ac-modes 'inferior-emacs-lisp-mode)
+       (auto-complete-mode 1))
+
+     (add-hook 'ielm-mode-hook 'ielm-auto-complete)
+   #+end_src
+
+** Chapter Thirteen /The Brave/
+   
+   #+begin_src emacs-lisp :tangle yes
+     ;; Loads Clojure setup from "Clojure for the Brave and True"
+     (load "setup-clojure.el")
+   #+end_src
+
+** Chapter Forteen /The Road More Travelled/
+   
+   [[http://ternjs.net/][Tern]] is a self described JavaScript code-analysis-engine, really great for
+   refactoring. It is installed under ~node_modules/~
+
+   #+begin_src emacs-lisp
+     (require 'js)
+     (require 'js2-mode)
+     (require 'js-align)
+
+     (setq js2-strict-missing-semi-warning nil)
+
+     (add-to-list 'load-path (expand-file-name "tern/emacs/" *node-modules-dir*))
+
+     (rename-modeline "js" js-mode "js")
+
+     (setq js-indent-level 2)
+     (setq js-switch-indent-offset 2)  ; Offset `case' and `default'
+     (setq js-expr-indent-offset 0)
+
+     (autoload 'tern-mode "tern.el" nil t)
+
+     ;; Use auto-complete for tern completion
+     (eval-after-load 'tern-mode
+       '(progn
+          (require 'tern-auto-complete)
+          (tern-ac-setup)))
+
+     (defun my/js-mode-hook ()
+       "My personal `js-mode-hook'."
+
+       ;; View the word "function" as just "ƒ" in the buffer
+       (font-lock-add-keywords
+        'js-mode `(("\\(function\\)"
+                    (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
+                              nil)))))
+
+       ;; Highlight with warning font around "TODO" and others
+       (font-lock-add-keywords 'js-mode
+                               '(("\\<\\(FIX\\|TODO\\|FIXME\\|HACK\\|REFACTOR\\):"
+                                  1 font-lock-warning-face t)))
+
+       ;; Use basic tern-mode
+       (tern-mode t)
+
+       ;; Use subword mode for word commands to work on camel case
+       (subword-mode t)
+
+       ;; Prevent subword from inserting a comma in mode line
+       (let ((entry (assq 'subword-mode minor-mode-alist)))
+         (when entry (setcdr entry '(nil)))))
+   #+end_src
+
+   Hook up all the minor modes to js-mode
+
+   #+begin_src emacs-lisp
+     (add-hook 'js-mode-hook #'my/js-mode-hook)
+     (add-hook 'js-mode-hook #'flycheck-mode)
+     (add-hook 'js-mode-hook #'yas-minor-mode)
+     (add-hook 'js-mode-hook #'whitespace-cleanup-mode)
+   #+end_src
+
+   #+begin_src emacs-lisp
+     (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+   #+end_src
+** Chapter Fifteen /The Exile of the Ding/
+   
+   Stop the fucking DING!!!
+
+   #+begin_src emacs-lisp :tangle yes
+     (setq ring-bell-function
+           (lambda ()
+             (unless (memq this-command
+                           '(isearch-abort
+                             abort-recursive-edit
+                             exit-minibuffer
+                             keyboard-quit
+                             mwheel-scroll
+                             down
+                             up
+                             next-line
+                             previous-line
+                             backward-char
+                             forward-char))
+               (ding))))
+
+     ;; Incorporate better somehow
+     (global-set-key [wheel-right] 'ignore)
+     (global-set-key [wheel-left] 'ignore)
+     (global-set-key [double-wheel-right] 'ignore)
+     (global-set-key [double-wheel-left] 'ignore)
+     (global-set-key [triple-wheel-right] 'ignore)
+     (global-set-key [triple-wheel-left] 'ignore)
+
+   #+end_src
+
+** Chapter Sixteen /The Wild Web/
+
+   #+begin_src emacs-lisp :tangle yes
+     (setq web-mode-engines-alist
+           '(("twig" . "\\.html\\'")))
+
+     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+     (setq web-mode-enable-engine-detection t)
+
+     (setq web-mode-markup-indent-offset 2)
+     (setq web-mode-css-indent-offset 2)
+     (setq web-mode-code-indent-offset 2)
+
+     (defun my-web-mode-hook ()
+       "Hooks for Web mode."
+       ;; Disable electric-pair-mode
+       (electric-pair-mode -1))
+
+     (add-hook 'web-mode-hook  'my-web-mode-hook)
+   #+end_src
+
+** Chapter Seventeen /The License/
+
+  The Emacs Configuration Tome of John Hooks written in Org mode.
+
+  Copyright (c) 2016 John Hooks
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.

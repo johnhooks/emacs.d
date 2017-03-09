@@ -523,7 +523,10 @@
 
    #+begin_src emacs-lisp
      (require 'js)
+     (require 'js2-mode)
      (require 'js-align)
+
+     (setq js2-strict-missing-semi-warning nil)
 
      (add-to-list 'load-path (expand-file-name "tern/emacs/" *node-modules-dir*))
 
@@ -575,6 +578,9 @@
      (add-hook 'js-mode-hook #'whitespace-cleanup-mode)
    #+end_src
 
+   #+begin_src emacs-lisp
+     (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+   #+end_src
 ** Chapter Fifteen /The Exile of the Ding/
    
    Stop the fucking DING!!!
@@ -625,6 +631,12 @@
        (electric-pair-mode -1))
 
      (add-hook 'web-mode-hook  'my-web-mode-hook)
+   #+end_src
+
+** Chapter Seventeen /The Ledger/
+
+   #+begin_src emacs-lisp :tangle yes
+     (require 'init-ledger)
    #+end_src
 
 ** Chapter Seventeen /The License/
