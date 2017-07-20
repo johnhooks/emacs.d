@@ -73,7 +73,7 @@
    face and increase in size.
 
    #+begin_src emacs-lisp :tangle yes
-     (set-face-attribute 'default nil :height 140)
+     (set-face-attribute 'default nil :height 150)
      (when (member "Source Code Pro" (font-family-list))
        (set-face-attribute 'default nil :font "Source Code Pro"))
      ;; (when (member "Inconsolata" (font-family-list))
@@ -83,7 +83,7 @@
    The initial frame size is inadequate.
 
    #+begin_src emacs-lisp :tangle yes
-     (add-to-list 'initial-frame-alist '(height . 40))
+     (add-to-list 'initial-frame-alist '(height . 52))
      (add-to-list 'initial-frame-alist '(width . 90))
    #+end_src
 
@@ -96,6 +96,7 @@
    Using the [[https://melpa.org][Milkypostman's Emacs Lisp Package Archive]]
 
    #+begin_src emacs-lisp
+     (require 'cl)
      (require 'package)
 
      ;; Define package repositories
@@ -140,7 +141,7 @@
                whitespace-cleanup-mode
                yasnippet
                zenburn-theme))
-            (uninstalled (remove-if 'package-installed-p packages)))
+            (uninstalled (cl-remove-if 'package-installed-p packages)))
        (when uninstalled
          (package-refresh-contents)
          (mapc 'package-install uninstalled)))
@@ -523,8 +524,26 @@
 
    #+begin_src emacs-lisp
      (require 'js)
-     (require 'js2-mode)
      (require 'js-align)
+
+     (require 'js2-mode)
+     (require 'jove-mode)
+
+     (flycheck-define-checker javascript-standard
+       "A Javascript code and style checker for the (Semi-)Standard Style.
+
+     This checker works with `standard' and `semistandard', defaulting
+     to the former.  To use it with the latter, set
+     `flycheck-javascript-standard-executable' to `semistandard'.
+
+     See URL `https://github.com/feross/standard' and URL
+     `https://github.com/Flet/semistandard'."
+       :command ("standard" "--stdin")
+       :standard-input t
+       :error-patterns
+       ((error line-start "  <text>:" line ":" column ":" (message) line-end))
+       :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode jove-mode))
+
 
      (setq js2-strict-missing-semi-warning nil)
 
@@ -548,10 +567,10 @@
        "My personal `js-mode-hook'."
 
        ;; View the word "function" as just "ƒ" in the buffer
-       (font-lock-add-keywords
-        'js-mode `(("\\(function\\)"
-                    (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
-                              nil)))))
+       ;; (font-lock-add-keywords
+       ;;  'js-mode `(("\\(function\\)"
+       ;;              (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
+       ;;                        nil)))))
 
        ;; Highlight with warning font around "TODO" and others
        (font-lock-add-keywords 'js-mode
@@ -579,7 +598,8 @@
    #+end_src
 
    #+begin_src emacs-lisp
-     (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+     ;; (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+     (add-to-list 'auto-mode-alist '("\\.js$" . jove-mode))
    #+end_src
 ** Chapter Fifteen /The Exile of the Ding/
    
@@ -636,7 +656,7 @@
 ** Chapter Seventeen /The Ledger/
 
    #+begin_src emacs-lisp :tangle yes
-     (require 'init-ledger)
+     ;; (require 'init-ledger)
    #+end_src
 
 ** Chapter Seventeen /The License/
