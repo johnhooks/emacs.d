@@ -95,7 +95,7 @@
 
    Using the [[https://melpa.org][Milkypostman's Emacs Lisp Package Archive]]
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle-yes
      (require 'cl)
      (require 'package)
 
@@ -132,12 +132,17 @@
                flycheck
                flx-ido
                ido-vertical-mode
+               inf-ruby
                magit
                nvm
                paredit
                projectile
+               projectile-rails
                rainbow-delimiters
+               rbenv
+               robe
                smex
+               web-mode
                whitespace-cleanup-mode
                yasnippet
                zenburn-theme))
@@ -302,13 +307,13 @@
    Configuration Nirvana.
 
 *** Avy
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
       (require 'avy)
       (global-set-key (kbd "C-:") 'avy-goto-char)
     #+end_src
 
 *** Interactively Do Things
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
       (require 'ido)
 
       (setq ido-everywhere t)
@@ -338,7 +343,7 @@
 
 *** Fuzzy Ido Matching
 
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
       (require 'flx-ido)
 
       (setq ido-enable-flex-matching t) ;; Turn on ido flexible matching.
@@ -348,7 +353,7 @@
     #+end_src
 
 *** Ido Vertial
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
       (require 'ido-vertical-mode)
 
       (setq ido-vertical-define-keys 'C-n-and-C-p-only) ; Bind C-n and C-p.
@@ -356,7 +361,7 @@
     #+end_src
 
 *** Smex
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
       (require 'smex)
 
       (setq smex-save-file
@@ -370,7 +375,9 @@
     #+end_src
 
 *** Projectile
-    #+begin_src emacs-lisp
+    [[http://projectile.readthedocs.io/en/latest/usage/][Usage]]
+
+    #+begin_src emacs-lisp :tangle yes
       (require 'projectile)
 
       (diminish 'projectile-mode "Prjl")
@@ -384,7 +391,7 @@
     #+end_src
 
 *** Recent Files
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
       (require 'recentf)
 
       (setq recentf-max-saved-items 100)
@@ -430,7 +437,7 @@
    Lastly, since the npm packages required for ~js-config.el~ are installed
    locally we also need to add them to ~exec-path~.
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle yes
      (when (eq system-type 'darwin) ; (memq window-system '(mac ns)) ; difference?
        (require 'exec-path-from-shell)
        (exec-path-from-shell-initialize))
@@ -474,7 +481,7 @@
       thee, what would life be with out thine children, Barfage and
       Slurpage?
 
-       #+begin_src emacs-lisp
+       #+begin_src emacs-lisp :tangle yes
          (require 'paredit)
          (eval-after-load "paredit" '(diminish 'paredit))
          (add-hook 'lisp-mode-hook #'enable-paredit-mode)
@@ -483,7 +490,7 @@
          (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
        #+end_src
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle yes
      (add-hook 'emacs-lisp-mode-hook #'whitespace-cleanup-mode)
 
      ;; eldoc-mode shows documentation in the minibuffer when writing code
@@ -495,7 +502,7 @@
 
    Add auto-complete to Interactive Emacs Lisp Mode (ielm)
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle yes
      (defun ielm-auto-complete ()
        "Enables `auto-complete' support in \\[ielm].
      As found at `https://www.masteringemacs.org/article/evaluating-elisp-emacs'"
@@ -522,7 +529,7 @@
    [[http://ternjs.net/][Tern]] is a self described JavaScript code-analysis-engine, really great for
    refactoring. It is installed under ~node_modules/~
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle yes
      (require 'js)
      (require 'js-align)
 
@@ -576,13 +583,14 @@
        (font-lock-add-keywords 'js-mode
                                '(("\\<\\(FIX\\|TODO\\|FIXME\\|HACK\\|REFACTOR\\):"
                                   1 font-lock-warning-face t)))
-
+       
        ;; Use basic tern-mode
        (tern-mode t)
 
        ;; Use subword mode for word commands to work on camel case
        (subword-mode t)
 
+       (js-align-mode)
        ;; Prevent subword from inserting a comma in mode line
        (let ((entry (assq 'subword-mode minor-mode-alist)))
          (when entry (setcdr entry '(nil)))))
@@ -590,18 +598,32 @@
 
    Hook up all the minor modes to js-mode
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle yes
      (add-hook 'js-mode-hook #'my/js-mode-hook)
      (add-hook 'js-mode-hook #'flycheck-mode)
      (add-hook 'js-mode-hook #'yas-minor-mode)
      (add-hook 'js-mode-hook #'whitespace-cleanup-mode)
    #+end_src
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :tangle yes
      ;; (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
      (add-to-list 'auto-mode-alist '("\\.js$" . jove-mode))
    #+end_src
-** Chapter Fifteen /The Exile of the Ding/
+** Chapter Fifteen /Follow the Ruby Brick Road/
+   To find the wizard follow the Ruby Brick Road! Because, because, because of all
+   the wonderful things he does!
+   
+   May the Great Ruby Wizard Matz imbue our buffers with magical Ruby powers!
+
+   #+begin_src emacs-lisp :tangle yes
+     (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+     (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+     (add-hook 'ruby-mode-hook 'robe-mode)
+     (add-hook 'robe-mode-hook 'ac-robe-setup)
+     ;; (global-rbenv-mode)
+     (projectile-rails-global-mode)
+   #+end_src
+** Chapter Sixteen /The Exile of the Ding/
    
    Stop the fucking DING!!!
 
@@ -632,38 +654,68 @@
 
    #+end_src
 
-** Chapter Sixteen /The Wild Web/
+** Chapter Seventeen /The Wild Web/
+   
+   #+begin_src emacs-lisp :tangle yes
+     (setq web-mode-expanders
+       '(("a/" . "<a href=\"|\"></a>")
+         ("b/" . "<table><tbody><tr><td>|</td></tr></tbody></table>")
+         ("c/" . "<div class=\"|\"></div>")
+         ("d/" . "<div>|</div>")
+         ("e/" . "<em>|</em>")
+         ("f/" . "<form>|</form>")
+         ("g/" . "<strong>|</strong>")
+         ("h/" . "<h1>|</h1>")
+         ("i/" . "<img src=\"|\" />")
+         ("j/" . "<script>|</script>")
+         ("l/" . "<li>|</li>")
+         ("m/" . "<main>|</main>")
+         ("n/" . "<input type=\"|\" />")
+         ("p/" . "<p>|</p>")
+         ("q/" . "<quote>|</quote>")
+         ("s/" . "<span>|</span>")
+         ("t/" . "<td>|</td>")
+         ("u/" . "<ul><li>|</li></ul>")
+         ("x/" . "<textarea>|</textarea>")
+
+         ("2/" . "<h2>|</h2>")
+         ("3/" . "<h3>|</h3>")
+         ("?/" . "<?php | ?>")))
+   #+end_src
 
    #+begin_src emacs-lisp :tangle yes
+     (add-to-list 'auto-mode-alist '("\\.hbs" . web-mode))
+
      (setq web-mode-engines-alist
-           '(("twig" . "\\.html\\'")))
+           '(("handlebars" . "\\.hbs")))
 
-     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-     (setq web-mode-enable-engine-detection t)
-
+     ;; (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+     ;; (setq web-mode-enable-engine-detection t)
+     (setq web-mode-enable-auto-expanding t)
+     (setq web-mode-enable-auto-pairing nil)
      (setq web-mode-markup-indent-offset 2)
      (setq web-mode-css-indent-offset 2)
      (setq web-mode-code-indent-offset 2)
 
-     (defun my-web-mode-hook ()
-       "Hooks for Web mode."
-       ;; Disable electric-pair-mode
-       (electric-pair-mode -1))
+     ;; (defun my-web-mode-hook ()
+     ;;   "Hooks for Web mode."
+     ;;   ;; Disable electric-pair-mode
+     ;;   (electric-pair-mode -1))
 
-     (add-hook 'web-mode-hook  'my-web-mode-hook)
+     ;; (add-hook 'web-mode-hook  'my-web-mode-hook)
    #+end_src
 
-** Chapter Seventeen /The Ledger/
+** Chapter Eighteen /The Ledger/
 
-   #+begin_src emacs-lisp :tangle yes
-     ;; (require 'init-ledger)
+   #+begin_src emacs-lisp :tangle no
+     (require 'init-ledger)
    #+end_src
 
-** Chapter Seventeen /The License/
+** Chapter Nineteen /The License/
 
   The Emacs Configuration Tome of John Hooks written in Org mode.
 
-  Copyright (c) 2016 John Hooks
+  Copyright (c) 2017 John Hooks
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

@@ -69,6 +69,8 @@
 ;; I want to set backup-directory-alist, but having some issues.
 ;; This is the short term fix.
 (setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
