@@ -83,7 +83,7 @@
    The initial frame size is inadequate.
 
    #+begin_src emacs-lisp :tangle yes
-     (add-to-list 'initial-frame-alist '(height . 52))
+     (add-to-list 'initial-frame-alist '(height . 55))
      (add-to-list 'initial-frame-alist '(width . 90))
    #+end_src
 
@@ -122,7 +122,8 @@
 
    #+begin_src emacs-lisp :tangle yes
      (let* ((packages
-             '(auto-complete
+             '(add-node-modules-path
+               auto-complete
                avy
                cider
                clojure-mode
@@ -180,7 +181,7 @@
      (global-set-key (kbd "C-;") #'my/toggle-comment-on-line)
    #+end_src
 
-** Chapter Eight /The Prayers of General Configuration/
+** COMMENT Chapter Eight /The Prayers of General Configuration/
    May the Great Gnu be with thee.
    
    1. May Zenburn ease the strain of concentrating on Thine text Oh Emacs
@@ -232,6 +233,7 @@
       #+begin_src emacs-lisp :tangle yes
         (require 'whitespace-cleanup-mode)
         (eval-after-load "whitespace-cleanup-mode" '(diminish 'whitespace-cleanup-mode))
+        (add-hook 'c-mode-hook #'whitespace-cleanup-mode)
       #+end_src
 
    6. [[https://github.com/joaotavora/yasnippet][YASnippet]], thanks be to thee for keeping mine snippets close and
@@ -272,8 +274,8 @@
         (require 'flycheck)
 
         (setq-default flycheck-emacs-lisp-load-path load-path)
-        (setq-default flycheck-disabled-checkers '(;emacs-lisp-checkdoc
-                                                   javascript-eslint))
+        ;; (setq-default flycheck-disabled-checkers '(;emacs-lisp-checkdoc
+        ;;                                            javascript-eslint))
         ; (global-flycheck-mode t)
       #+end_src
 
@@ -551,6 +553,28 @@
        ((error line-start "  <text>:" line ":" column ":" (message) line-end))
        :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode jove-mode))
 
+     (flycheck-define-checker javascript-eslint
+       "A Javascript syntax and style checker using eslint.
+     See URL `http://eslint.org/'."
+       :command ("eslint" "--format=json"
+                 (option-list "--rulesdir" flycheck-eslint-rules-directories)
+                 (eval flycheck-eslint-args)
+                 "--stdin" "--stdin-filename" source-original)
+       :standard-input t
+       :error-parser flycheck-parse-eslint
+       :enabled (lambda () (flycheck-eslint-config-exists-p))
+       :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode jove-mode)
+       :working-directory flycheck-eslint--find-working-directory
+       :verify
+       (lambda (_)
+         (let* ((default-directory
+                  (flycheck-compute-working-directory 'javascript-eslint))
+                (have-config (flycheck-eslint-config-exists-p)))
+           (list
+            (flycheck-verification-result-new
+             :label "config file"
+             :message (if have-config "found" "missing or incorrect")
+             :face (if have-config 'success '(bold error)))))))
 
      (setq js2-strict-missing-semi-warning nil)
 
@@ -590,7 +614,7 @@
        ;; Use subword mode for word commands to work on camel case
        (subword-mode t)
 
-       (js-align-mode)
+       ;; (js-align-mode)
        ;; Prevent subword from inserting a comma in mode line
        (let ((entry (assq 'subword-mode minor-mode-alist)))
          (when entry (setcdr entry '(nil)))))
@@ -603,6 +627,8 @@
      (add-hook 'js-mode-hook #'flycheck-mode)
      (add-hook 'js-mode-hook #'yas-minor-mode)
      (add-hook 'js-mode-hook #'whitespace-cleanup-mode)
+     (add-hook 'js-mode-hook #'prettier-js-mode)
+     (add-hook 'js-mode-hook #'add-node-modules-path)
    #+end_src
 
    #+begin_src emacs-lisp :tangle yes
@@ -654,41 +680,48 @@
 
    #+end_src
 
-** Chapter Seventeen /The Wild Web/
+** COMMENT Chapter Seventeen /The Wild Web/
    
    #+begin_src emacs-lisp :tangle yes
      (setq web-mode-expanders
-       '(("a/" . "<a href=\"|\"></a>")
-         ("b/" . "<table><tbody><tr><td>|</td></tr></tbody></table>")
-         ("c/" . "<div class=\"|\"></div>")
-         ("d/" . "<div>|</div>")
-         ("e/" . "<em>|</em>")
-         ("f/" . "<form>|</form>")
-         ("g/" . "<strong>|</strong>")
-         ("h/" . "<h1>|</h1>")
-         ("i/" . "<img src=\"|\" />")
-         ("j/" . "<script>|</script>")
-         ("l/" . "<li>|</li>")
-         ("m/" . "<main>|</main>")
-         ("n/" . "<input type=\"|\" />")
-         ("p/" . "<p>|</p>")
-         ("q/" . "<quote>|</quote>")
-         ("s/" . "<span>|</span>")
-         ("t/" . "<td>|</td>")
-         ("u/" . "<ul><li>|</li></ul>")
-         ("x/" . "<textarea>|</textarea>")
+           '(("a/" . "<a href=\"|\"></a>")
+             ("b/" . "<table><tbody><tr><td>|</td></tr></tbody></table>")
+             ("c/" . "<div class=\"|\"></div>")
+             ("d/" . "<div>|</div>")
+             ("e/" . "<em>|</em>")
+             ("f/" . "<form>|</form>")
+             ("g/" . "<strong>|</strong>")
+             ("h/" . "<h1>|</h1>")
+             ("i/" . "<img src=\"|\" />")
+             ("j/" . "<script>|</script>")
+             ("l/" . "<li>|</li>")
+             ("m/" . "<main>|</main>")
+             ("n/" . "<input type=\"|\" />")
+             ("p/" . "<p>|</p>")
+             ("q/" . "<quote>|</quote>")
+             ("s/" . "<span>|</span>")
+             ("t/" . "<td>|</td>")
+             ("u/" . "<ul><li>|</li></ul>")
+             ("x/" . "<textarea>|</textarea>")
 
-         ("2/" . "<h2>|</h2>")
-         ("3/" . "<h3>|</h3>")
-         ("?/" . "<?php | ?>")))
+             ("2/" . "<h2>|</h2>")
+             ("3/" . "<h3>|</h3>")
+             ("?/" . "<?php | ?>")
+             ("=/" . "<%= | %>")
+             ("%/" . "<% | %>")))
    #+end_src
 
    #+begin_src emacs-lisp :tangle yes
      (add-to-list 'auto-mode-alist '("\\.hbs" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.eex" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.erb" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.blade\\." . web-mode))
 
      (setq web-mode-engines-alist
-           '(("handlebars" . "\\.hbs")))
-
+           '(("blade" . "\\.blade\\.")
+             ("handlebars" . "\\.hbs")
+             ("elixir" . "\\.eex")))
+                
      ;; (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
      ;; (setq web-mode-enable-engine-detection t)
      (setq web-mode-enable-auto-expanding t)
@@ -702,7 +735,8 @@
      ;;   ;; Disable electric-pair-mode
      ;;   (electric-pair-mode -1))
 
-     ;; (add-hook 'web-mode-hook  'my-web-mode-hook)
+     (setq css-indent-offset 2)
+     (add-hook 'css-mode-hook  'whitespace-cleanup-mode)
    #+end_src
 
 ** Chapter Eighteen /The Ledger/
