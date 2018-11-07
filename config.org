@@ -181,7 +181,7 @@
      (global-set-key (kbd "C-;") #'my/toggle-comment-on-line)
    #+end_src
 
-** COMMENT Chapter Eight /The Prayers of General Configuration/
+** Chapter Eight /The Prayers of General Configuration/
    May the Great Gnu be with thee.
    
    1. May Zenburn ease the strain of concentrating on Thine text Oh Emacs
@@ -624,7 +624,7 @@
 
    #+begin_src emacs-lisp :tangle yes
      (add-hook 'js-mode-hook #'my/js-mode-hook)
-     (add-hook 'js-mode-hook #'flycheck-mode)
+     ;; (add-hook 'js-mode-hook #'flycheck-mode)
      (add-hook 'js-mode-hook #'yas-minor-mode)
      (add-hook 'js-mode-hook #'whitespace-cleanup-mode)
      (add-hook 'js-mode-hook #'prettier-js-mode)
@@ -680,7 +680,7 @@
 
    #+end_src
 
-** COMMENT Chapter Seventeen /The Wild Web/
+** Chapter Seventeen /The Wild Web/
    
    #+begin_src emacs-lisp :tangle yes
      (setq web-mode-expanders
@@ -741,8 +741,18 @@
 
 ** Chapter Eighteen /The Ledger/
 
-   #+begin_src emacs-lisp :tangle no
-     (require 'init-ledger)
+   #+begin_src emacs-lisp :tangle yes
+     (defun my/ledger-mode-hook ()
+       "My personal `ledger-mode-hook'."
+       ;; At the moment ledge-mode is unable to parse an account with no
+       ;; transaction amount.  My work around is to use an account directive file.
+       ;; https://github.com/ledger/ledger-mode/issues/141
+       (let ((files (directory-files (file-name-directory (buffer-file-name)))))
+         (when (member "Accounts.dat" files)
+           (make-local-variable 'ledger-accounts-file)
+           (setq ledger-accounts-file (expand-file-name "Accounts.dat")))))
+
+     (add-hook 'ledger-mode-hook #'my/ledger-mode-hook)
    #+end_src
 
 ** Chapter Nineteen /The License/
